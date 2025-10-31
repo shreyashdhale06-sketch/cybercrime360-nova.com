@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CyberGuard 360 — Cyber Awareness & Reporting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071025;
+      --panel:#0b1624;
+      --muted:#98a6b3;
+      --neon:#00d1ff;
+      --green:#00ff9c;
+      --glass: rgba(255,255,255,0.03);
+      --accent: linear-gradient(90deg,var(--neon),var(--green));
+      --overlay-z: 99999;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial;
+      background: radial-gradient(circle at 10% 10%, rgba(0,20,40,0.6), transparent 200px), var(--bg);
+      color:#e6f0f7;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+    }
+    a{color:var(--neon);text-decoration:none}
+    header{
+      padding:22px 32px;
+      display:flex;align-items:center;gap:20px;justify-content:space-between;
+      position:sticky;top:0;backdrop-filter:blur(6px);z-index:40
+    }
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{
+      width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#05283a,#00121b);
+      display:grid;place-items:center;font-family:'Orbitron';font-weight:700;color:var(--neon)
+    }
+    nav{display:flex;gap:14px;align-items:center}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,#003a56,#005b8a);border:0;padding:10px 16px;color:#eafcff}
+
+    .container{max-width:1200px;margin:28px auto;padding:0 22px;display:grid;grid-template-columns:1fr 320px;gap:26px}
+
+    /* Hero */
+    .hero{padding:28px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);box-shadow:0 6px 30px rgba(2,12,24,0.6);display:flex;gap:28px}
+    .hero-left{flex:1}
+    .hero h1{font-family:'Orbitron';font-size:38px;margin:0 0 6px}
+    .hero p{color:var(--muted);margin:6px 0 18px}
+    .hero .cta{display:flex;gap:12px}
+    .statbar{display:flex;gap:18px;margin-top:18px}
+    .stat{background:var(--glass);padding:10px 14px;border-radius:10px;min-width:120px;text-align:center}
+    .stat small{display:block;color:var(--muted)}
+
+    /* Right column */
+    .sidebar{position:sticky;top:90px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;margin-bottom:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+    .coach{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center}
+    .avatar{width:64px;height:64px;border-radius:10px;background:linear-gradient(180deg,#052b3a,#002233);display:grid;place-items:center;color:var(--neon);font-weight:700}
+
+    /* Awareness Hub */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .tabs{display:flex;gap:8px}
+    .tab{padding:6px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);font-weight:600}
+
+    /* Fake Link Detector */
+    .detector input{width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;outline:none}
+    .analyze-row{display:flex;gap:10px;margin-top:10px}
+    .meter{height:12px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden}
+    .meter > b{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon),var(--green));transition:width 500ms, background 300ms}
+
+    /* Report form */
+    .stepper{display:flex;gap:8px;align-items:center;margin:10px 0}
+    .step{padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);font-weight:600}
+    .form-row{display:flex;flex-direction:column;gap:8px}
+    textarea{min-height:90px;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
+    input[type=file]{color:var(--muted)}
+
+    /* Map placeholder */
+    .map{height:170px;border-radius:10px;background:linear-gradient(180deg,#032034,#031018);display:grid;place-items:center;color:var(--muted);font-weight:600}
+
+    footer{padding:28px 22px;margin-top:26px;color:var(--muted);text-align:center}
+
+    /* responsiveness */
+    @media (max-width:980px){
+      .container{grid-template-columns:1fr}
+      header{padding:14px}
+      .hero h1{font-size:28px}
+    }
+
+    /* small helpers */
+    .muted{color:var(--muted)}
+    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);font-weight:700}
+    .report-list{max-height:240px;overflow:auto;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+    .report-item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);display:flex;justify-content:space-between;align-items:flex-start;gap:8px;border:1px solid rgba(255,255,255,0.02)}
+    .small{font-size:12px;color:var(--muted)}
+
+    /* ====== EMAIL OVERLAY (NEON BLUE) ====== */
+    #cg_emailOverlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, rgba(2,6,23,0.95), rgba(0,0,0,0.95));
+      z-index: var(--overlay-z);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      padding: 28px;
+    }
+    #cg_emailOverlay .cg_gate {
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 40px rgba(0,209,255,0.06);
+      border: 1px solid rgba(0,209,255,0.12);
+      background: linear-gradient(180deg, rgba(0,16,26,0.55), rgba(0,8,12,0.55));
+    }
+    #cg_emailOverlay h1 {
+      font-family: 'Orbitron', sans-serif;
+      margin: 0 0 12px;
+      font-size: 28px;
+      color: #00d1ff;
+      text-shadow: 0 0 12px rgba(0,209,255,0.25), 0 0 30px rgba(0,209,255,0.12);
+    }
+    #cg_emailOverlay p { margin: 0 0 16px; color: #9fbfd6; }
+    #cg_userEmail {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,209,255,0.14);
+      background: rgba(2,14,25,0.6);
+      color: #cfefff;
+      font-size: 16px;
+      outline: none;
+      box-shadow: 0 6px 24px rgba(0,209,255,0.03);
+    }
+    #cg_userEmail::placeholder { color: #8aa9bf; }
+    #cg_accessBtn {
+      margin-top: 8px;
+      background: linear-gradient(90deg,#00d1ff,#00ff9c);
+      border: none;
+      color: #00121b;
+      font-weight: 700;
+      padding: 11px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 8px 30px rgba(0,209,255,0.12);
+    }
+    #cg_accessBtn:hover { transform: translateY(-2px); transition: transform .18s ease; }
+
+    /* ====== WELCOME INTERFACE ====== */
+    #cg_welcome {
+      position: fixed;
+      inset: 0;
+      display: none; /* shown after email validated */
+      z-index: calc(var(--overlay-z) - 1);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      padding: 30px;
+      overflow:auto;
+      background: radial-gradient(circle at center, rgba(1,6,14,0.92), rgba(0,0,0,0.92));
+    }
+    .cg_welcome_card {
+      max-width: 1000px;
+      width: 100%;
+      margin: 40px auto;
+      background: linear-gradient(180deg, rgba(3,12,20,0.55), rgba(0,6,10,0.55));
+      border-radius: 14px;
+      padding: 28px;
+      border: 1px solid rgba(0,209,255,0.08);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(0,209,255,0.03) inset;
+      color: #dff6ff;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 22px;
+      align-items: start;
+    }
+    .cg_welcome_head { font-family: 'Orbitron', sans-serif; font-size: 22px; color: var(--neon); margin-bottom:12px; text-shadow: 0 0 12px rgba(0,209,255,0.12); }
+    .cg_welcome_sub { color: #b9dbe8; margin-bottom:14px; font-weight:600; }
+    .cg_welcome_text { color: #cfefff; line-height:1.5; font-size:15px; }
+    .cg_welcome_sidebar {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:14px; border-radius:10px; border: 1px solid rgba(0,209,255,0.04);
+    }
+    .cg_infographic { display:flex;gap:12px;align-items:center;margin-bottom:12px }
+    .cg_svg_box { width:74px;height:74px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(180deg, rgba(0,13,20,0.45), rgba(0,6,10,0.35)); border:1px solid rgba(0,209,255,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+    .cg_svg_label { color: #bfe8fb; font-weight:700; font-size:14px; }
+
+    .cg_enter_btn {
+      margin-top:16px;
+      display:inline-block;
+      background: linear-gradient(90deg,#00d1ff,#00ff9c);
+      color:#00121b;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight:800;
+      border:0;
+      cursor:pointer;
+      box-shadow: 0 10px 40px rgba(0,209,255,0.12);
+    }
+    .cg_enter_small { margin-top:10px; color:#98c5d8; font-size:13px; }
+
+    /* fade animations */
+    .cg_fade_out { animation: cgFadeOut 0.6s ease forwards; }
+    .cg_fade_in { animation: cgFadeIn 0.6s ease forwards; display:block !important; }
+    @keyframes cgFadeOut { from { opacity:1; transform: translateY(0); } to { opacity:0; transform: translateY(-8px); visibility:hidden; } }
+    @keyframes cgFadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+
+    /* keep body no scroll when overlays show (script toggles class) */
+    body.cg-no-scroll { overflow: hidden; height: 100vh; }
+
+    /* small responsive */
+    @media (max-width:900px) {
+      .cg_welcome_card { grid-template-columns: 1fr; padding:18px; }
+      .cg_welcome_sidebar { order: -1; }
+      .cg_svg_box { width:58px;height:58px }
+    }
+  </style>
+</head>
+<body>
+  <!-- ====== EMAIL OVERLAY (always shows) ====== -->
+  <div id="cg_emailOverlay" role="dialog" aria-modal="true" aria-label="Email access gate">
+    <div class="cg_gate" role="document">
+      <h1>⚡ CyberGuard 360</h1>
+      <p style="margin-bottom:12px;">Enter your email to access the site</p>
+      <input id="cg_userEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+        <button id="cg_accessBtn">Access Website</button>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#8eaec0">We only ask email for demo access. No data is stored by this demo.</p>
+    </div>
+  </div>
+
+  <!-- ====== WELCOME INTERFACE (shows after valid email) ====== -->
+  <div id="cg_welcome" role="dialog" aria-modal="true" aria-label="Welcome interface">
+    <div class="cg_welcome_card" role="document" aria-live="polite">
+      <div>
+        <div class="cg_welcome_head">Welcome to CyberGuard 360 — A Step Towards a Safer Digital World</div>
+        <div class="cg_welcome_sub">Cybercrime Awareness & Reporting System</div>
+
+        <div class="cg_welcome_text">
+          <strong>🌟 Summary: Your Digital Shield</strong><br>
+          In our increasingly connected world, digital safety is as crucial as physical safety. Cybercrime poses a significant threat to individuals, organizations, and even governments, leading to financial loss, identity theft, and reputational damage.<br><br>
+
+          This portal is your guide to understanding the evolving landscape of cyber threats, adopting essential safety practices, and knowing precisely how and when to report an incident. Our mission is to empower you to become the strongest defense against cybercriminals, ensuring a safer digital experience for everyone. Awareness is the first line of defense; reporting is the critical next step.<br><br>
+
+          <strong>🚨 What is Cybercrime?</strong><br>
+          Cybercrime refers to any criminal activity that involves a computer, network, or networked device. The computer can be used as a tool to commit a crime (e.g., distributing illegal content) or as the target of a crime (e.g., hacking, malware attacks).<br><br>
+
+          <strong>Common Types of Cybercrime:</strong><br>
+          <ul style="margin:8px 0 10px 18px; color:#cfefff;">
+            <li><strong>Phishing & Social Engineering:</strong> Deceptive attempts to trick you into revealing sensitive information like passwords or OTPs.</li>
+            <li><strong>Identity Theft:</strong> Stealing personal information to commit fraud.</li>
+            <li><strong>Malware & Ransomware:</strong> Malicious software infecting systems; ransomware locks files and demands payment.</li>
+            <li><strong>Online Financial Fraud:</strong> Unauthorized transactions & fake loan or investment scams.</li>
+            <li><strong>Cyberbullying & Harassment:</strong> Using digital platforms to intimidate or abuse individuals.</li>
+          </ul>
+
+          <strong>Cybercrime Reporting System</strong><br>
+          Immediate action is key to mitigating loss and assisting authorities. Follow these steps as soon as you suspect or confirm a cybercrime incident.<br><br>
+
+          <strong>1. Secure Your Accounts & Devices</strong><br>
+          Change passwords for compromised accounts and contact your bank if money was lost. Disconnect infected devices from the network.<br><br>
+
+          <strong>2. Collect and Preserve Evidence</strong><br>
+          Do NOT delete anything. Save screenshots, emails, transaction details, chat logs, and URLs; note date/time and communication details.<br><br>
+
+          <strong>3. Report to the Authorities</strong><br>
+          Find your local cybercrime unit’s official reporting portal or helpline and lodge a formal complaint providing all collected evidence.<br><br>
+
+          <strong>Community Voice: Unmasking Cybercrime Across Generations</strong><br>
+          The digital experience is not universal. Survey insights show:
+          <ul style="margin:8px 0 0 18px; color:#cfefff;">
+            <li><strong>Young Adults (18-30s):</strong> Targeted more frequently with high-volume scams like shopping fraud, job scams, and phishing.</li>
+            <li><strong>Older Adults (60s+):</strong> Targeted less often but suffer higher financial losses per incident; vulnerable to tech-support and prize scams.</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:14px;">
+          <button class="cg_enter_btn" id="cg_enterBtn">Enter Website</button>
+          <div class="cg_enter_small">Click to continue to CyberGuard 360 — learn, scan, and report.</div>
+        </div>
+      </div>
+
+      <!-- Right column: SVG infographics -->
+      <aside class="cg_welcome_sidebar" aria-hidden="false">
+        <div style="font-weight:700;margin-bottom:10px;color:#bfe8fb">Quick Visuals</div>
+
+        <div class="cg_infographic">
+          <div class="cg_svg_box" aria-hidden="true">
+            <!-- Shield SVG -->
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l7 3v5c0 5-3.5 9.6-7 11-3.5-1.4-7-6-7-11V5l7-3z" stroke="#00d1ff" stroke-width="1.2" fill="rgba(0,209,255,0.06)" stroke-linejoin="round"></path>
+              <path d="M9.5 11.5l1.8 2.1L15 9" stroke="#00ff9c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="cg_svg_label">Secure</div>
+            <div style="font-size:13px;color:#98c5d8">Protect accounts & devices</div>
+          </div>
+        </div>
+
+        <div class="cg_infographic">
+          <div class="cg_svg_box">
+            <!-- Report/Doc SVG -->
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="3" width="12" height="18" rx="2" stroke="#00d1ff" stroke-width="1.2" fill="rgba(0,209,255,0.03)"></rect>
+              <path d="M8 7h6M8 11h6" stroke="#bfe8fb" stroke-width="1.2" stroke-linecap="round"></path>
+              <path d="M18 7v10" stroke="#00ff9c" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="cg_svg_label">Report</div>
+            <div style="font-size:13px;color:#98c5d8">Collect & submit evidence</div>
+          </div>
+        </div>
+
+        <div class="cg_infographic">
+          <div class="cg_svg_box">
+            <!-- Magnifier / Scan SVG -->
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="11" r="5" stroke="#00d1ff" stroke-width="1.2" fill="rgba(0,209,255,0.02)"></circle>
+              <path d="M20 20l-3.5-3.5" stroke="#00ff9c" stroke-width="1.6" stroke-linecap="round"></path>
+              <path d="M8 11h2" stroke="#bfe8fb" stroke-width="1.2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div>
+            <div class="cg_svg_label">Scan</div>
+            <div style="font-size:13px;color:#98c5d8">Analyze suspicious links</div>
+          </div>
+        </div>
+
+        <div class="cg_infographic">
+          <div class="cg_svg_box">
+            <!-- Users / Community SVG -->
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 14c-2 0-3 1-3 3v1h6v-1c0-2-1-3-3-3z" stroke="#00d1ff" stroke-width="1.1" fill="rgba(0,209,255,0.02)"></path>
+              <circle cx="8" cy="9" r="2" stroke="#bfe8fb" stroke-width="1.1" fill="rgba(191,232,251,0.02)"></circle>
+              <path d="M16 12c1.7 0 2.7 1 2.7 2.5V16h-5.4v-1.5C13.3 13 14.3 12 16 12z" stroke="#00ff9c" stroke-width="1.1" fill="rgba(0,255,156,0.02)"></path>
+              <circle cx="16" cy="9" r="1.6" stroke="#bfe8fb" stroke-width="1.1" fill="rgba(191,232,251,0.02)"></circle>
+            </svg>
+          </div>
+          <div>
+            <div class="cg_svg_label">Community</div>
+            <div style="font-size:13px;color:#98c5d8">Surveys & insights</div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- ====== ORIGINAL FULL WEBSITE (unchanged) ====== -->
+  <header>
+    <div class="brand">
+      <div class="logo">CG</div>
+      <div>
+        <div style="font-weight:700">CyberGuard 360</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">Think before you click</div>
+      </div>
+    </div>
+    <nav>
+      <a class="btn" href="#awareness">Awareness</a>
+      <a class="btn" href="#detector">Scan Link</a>
+      <a class="btn-primary" href="#report">Report a Crime</a>
+    </nav>
+  </header>
+
+  <main class="container" id="main_site">
+    <section>
+      <div class="hero">
+        <div class="hero-left">
+          <h1>Think Before You Click</h1>
+          <p class="muted">Your first line of cyber defense — report scams, learn safe habits, and scan suspicious links instantly.</p>
+
+          <div class="cta">
+            <button class="btn-primary" onclick="document.getElementById('detector-input').focus()">Scan Link / Check Scam</button>
+            <button class="btn" onclick="document.getElementById('report').scrollIntoView({behavior:'smooth'})">Report a Cybercrime</button>
+            <button class="btn" onclick="openQuiz()">Take Quiz</button>
+          </div>
+
+          <div class="statbar">
+            <div class="stat"><strong id="stat-protected">5,000+</strong><small class="muted">people protected</small></div>
+            <div class="stat"><strong id="stat-reports">1,200+</strong><small class="muted">reports processed</small></div>
+            <div class="stat"><strong>Real-time</strong><small class="muted">scams tracked</small></div>
+          </div>
+
+          <!-- Cyber Experience Zone (replaces Awareness Hub) -->
+          <div id="awareness" class="card" style="margin-top:18px">
+            <div class="section-title">
+              <div>
+                <div style="font-weight:700">Cyber Experience Zone</div>
+                <div class="muted" style="font-size:13px">Interactive learning through live simulations & AI tips</div>
+              </div>
+              <div class="tabs" aria-hidden="true">
+                <div class="tab">Experience</div>
+                <div class="tab">Live Tips</div>
+                <div class="tab">Simulate</div>
+              </div>
+            </div>
+
+            <div class="grid">
+              <!-- Tip of the Day -->
+              <div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:10px">
+                <div style="font-weight:700;margin-bottom:6px">💡 Cyber Tip of the Day</div>
+                <div class="muted" id="daily-tip">Always check the sender’s email domain before clicking any link.</div>
+              </div>
+
+              <!-- Simulation game -->
+              <div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:10px">
+                <div style="font-weight:700;margin-bottom:6px">🎮 Spot the Scam (Mini Game)</div>
+                <div class="muted" style="font-size:13px">Test your skills! Identify fake posts and phishing messages.</div>
+                <button class="btn-primary" style="margin-top:8px" onclick="startScamGame()">Start Game</button>
+              </div>
+
+              <!-- Live threat stats -->
+              <div style="background:rgba(255,255,255,0.02);padding:14px;border-radius:10px">
+                <div style="font-weight:700;margin-bottom:6px">📊 Global Threat Meter</div>
+                <div class="muted" id="threat-summary">Phishing ↑ 14% • Malware ↓ 5% • Data Leaks ↑ 9%</div>
+                <div class="meter" style="margin-top:10px"><b id="threat-meter" style="width:70%"></b></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fake Link Detector (enhanced, color-coded) -->
+          <div id="detector" class="card detector" style="margin-top:18px">
+            <div class="section-title">
+              <div style="font-weight:700">Fake Link / Scam Detector</div>
+              <div class="muted">Paste a link or suspicious text to analyze</div>
+            </div>
+            <div>
+              <input id="detector-input" placeholder="Paste URL or suspicious message here" />
+              <div class="analyze-row">
+                <button class="btn-primary" style="flex:0 0 140px;margin-top:6px" onclick="analyzeLink()">Analyze</button>
+                <div class="pill muted" id="detector-result" style="margin-top:8px;background:rgba(255,255,255,0.05)">No analysis yet</div>
+              </div>
+
+              <div style="margin-top:12px">
+                <div class="muted">Danger Level</div>
+                <div class="meter" style="margin-top:8px"><b id="meter-bar"></b></div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn" onclick="generateFIR()">Generate FIR Template</button>
+                  <button class="btn" onclick="reportFromDetector()">Report This Link</button>
+                  <button class="btn" onclick="copyDetector()">Copy Result</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Form -->
+          <div id="report" class="card" style="margin-top:18px">
+            <div class="section-title">
+              <div style="font-weight:700">Report a Cybercrime</div>
+              <div class="muted">Guided multi-step reporting — anonymous option available</div>
+            </div>
+            <div class="stepper" id="stepper">
+              <div class="step" id="step-1-pill">1. Type</div>
+              <div class="step" id="step-2-pill">2. Details</div>
+              <div class="step" id="step-3-pill">3. Submit</div>
+            </div>
+            <div id="report-forms">
+              <div id="step-1">
+                <div class="form-row">
+                  <label class="muted">Type of Incident</label>
+                  <select id="incident-type">
+                    <option>Phishing / Fake website</option>
+                    <option>OTP/Bank Fraud</option>
+                    <option>Social Media Account Compromise</option>
+                    <option>Online Scam / Marketplace Fraud</option>
+                    <option>Identity Theft</option>
+                    <option>Other</option>
+                  </select>
+                  <button class="btn-primary" onclick="nextStep()">Next</button>
+                </div>
+              </div>
+
+              <div id="step-2" style="display:none">
+                <div class="form-row">
+                  <label class="muted">Describe what happened</label>
+                  <textarea id="incident-desc" placeholder="Provide details, links, screenshots..."></textarea>
+                  <label class="muted">Attach evidence (screenshots, chat logs) — file name will be saved (no server)</label>
+                  <input type="file" id="evidence" />
+                  <div style="display:flex;gap:10px">
+                    <button class="btn" onclick="prevStep()">Back</button>
+                    <button class="btn-primary" onclick="nextStep()">Next</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="step-3" style="display:none">
+                <div class="form-row">
+                  <label class="muted">Contact (optional)</label>
+                  <input id="report-contact" placeholder="Email or phone — leave blank for anonymous" />
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                    <div class="muted">By submitting you agree this report may be shared with authorities</div>
+                    <div style="display:flex;gap:10px">
+                      <button class="btn" onclick="prevStep()">Back</button>
+                      <button class="btn-primary" onclick="submitReport()">Submit Report</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Local saved reports -->
+            <div style="margin-top:14px">
+              <div style="font-weight:700">Saved Reports (Local)</div>
+              <div class="small muted">Stored locally in your browser (demo only)</div>
+              <div id="reports-container" class="report-list" aria-live="polite"></div>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button class="btn" onclick="exportAllReports()">Export All (JSON)</button>
+                <button class="btn" onclick="clearAllReports()">Clear All (Local)</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <aside class="sidebar">
+          <div class="card map">
+            <div>Cybercrime Heat Map (placeholder)</div>
+          </div>
+
+          <div class="card coach">
+            <div class="avatar">AI</div>
+            <div>
+              <div style="font-weight:700">AI Cyber Coach</div>
+              <div class="muted" style="font-size:13px">Password Strength · Privacy Analyzer · Weekly Report</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:700">Quick Tools</div>
+            <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+              <button class="btn" onclick="openPasswordCheck()">Password Strength Checker</button>
+              <button class="btn" onclick="openPrivacyAudit()">Privacy Exposure Scan</button>
+              <button class="btn" onclick="openQuiz()">Start Quiz</button>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+
+      <footer>
+        <div style="max-width:900px;margin:0 auto">© CyberGuard 360 — Built for awareness. This is a demo frontend mockup (no backend). For production, integrate secure APIs, server-side validation and follow privacy law requirements.</div>
+      </footer>
+
+    </section>
+  </main>
+
+  <!-- ====== SCRIPTS ====== -->
+  <script>
+    // ===== EMAIL OVERLAY BEHAVIOR =====
+    (function(){
+      const overlay = document.getElementById('cg_emailOverlay');
+      const emailInput = document.getElementById('cg_userEmail');
+      const btn = document.getElementById('cg_accessBtn');
+      const welcome = document.getElementById('cg_welcome');
+
+      // lock body scroll while overlay is visible
+      const lockScroll = () => { document.body.classList.add('cg-no-scroll'); };
+      const unlockScroll = () => { document.body.classList.remove('cg-no-scroll'); };
+
+      lockScroll();
+      // auto-focus email input
+      setTimeout(()=> { emailInput.focus(); }, 180);
+
+      function validateEmail() {
+        const v = (emailInput.value || '').trim();
+        // simple RFC-like test
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!v || !re.test(v)) {
+          alert('Please enter a valid email address.');
+          emailInput.focus();
+          return false;
+        }
+        return true;
+      }
+
+      function hideEmailOverlayAndShowWelcome() {
+        overlay.classList.add('cg_fade_out');
+        // After fade out, hide email overlay (but we keep scroll locked until welcome dismissed)
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          // show welcome overlay
+          welcome.style.display = 'block';
+          welcome.classList.add('cg_fade_in');
+          // keep scroll locked until final Enter Website
+        }, 650);
+      }
+
+      btn.addEventListener('click', function(){
+        if (validateEmail()) {
+          // optionally show the entered email in welcome (we won't store it)
+          hideEmailOverlayAndShowWelcome();
+        }
+      });
+
+      // submit on Enter
+      emailInput.addEventListener('keydown', function(evt){
+        if (evt.key === 'Enter') {
+          evt.preventDefault();
+          if (validateEmail()) hideEmailOverlayAndShowWelcome();
+        }
+      });
+
+      // intentionally DO NOT check or save email to localStorage -> gate always shows next time as user requested.
+    })();
+
+
+    // ===== WELCOME INTERFACE BEHAVIOR =====
+    (function(){
+      const welcome = document.getElementById('cg_welcome');
+      const enterBtn = document.getElementById('cg_enterBtn');
+
+      function revealMainSite() {
+        // fade out welcome then unlock scroll and remove overlay
+        welcome.classList.remove('cg_fade_in');
+        welcome.classList.add('cg_fade_out');
+        setTimeout(()=> {
+          welcome.style.display = 'none';
+          // unlock scroll
+          document.body.classList.remove('cg-no-scroll');
+          // small focus to main site
+          const main = document.getElementById('main_site');
+          if (main) main.setAttribute('tabindex','-1'), main.focus();
+        }, 650);
+      }
+
+      enterBtn.addEventListener('click', function(){
+        revealMainSite();
+      });
+
+      // pressing Escape on welcome closes it too (but only if email gate already closed)
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape') {
+          if (welcome.style.display === 'block') revealMainSite();
+        }
+      });
+    })();
+
+    // ---------------------------
+    // Data & LocalStorage helpers for reports (unchanged)
+    // ---------------------------
+    const STORAGE_KEY = 'cg_reports_v1';
+
+    function loadReports() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+    function saveReports(arr) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      renderReports();
+    }
+
+    function renderReports() {
+      const container = document.getElementById('reports-container');
+      const reports = loadReports();
+      if(!container) return;
+      container.innerHTML = '';
+      if (reports.length === 0) {
+        container.innerHTML = '<div class="muted small">No local reports yet.</div>';
+        return;
+      }
+      reports.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'report-item';
+        div.innerHTML = `
+          <div style="flex:1">
+            <div style="font-weight:700">${escapeHtml(r.type)} — ${r.contact ? escapeHtml(r.contact) : 'Anonymous'}</div>
+            <div class="small muted">${new Date(r.createdAt).toLocaleString()} • ID: ${r.id}</div>
+            <div class="small" style="margin-top:6px;color:#dfeff6">${truncate(r.desc, 140)}</div>
+            ${r.detector ? '<div class="small muted" style="margin-top:6px">Scanned: '+escapeHtml(r.detector)+'</div>' : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <button class="btn" onclick="exportReport('${r.id}')">Export</button>
+            <button class="btn" onclick="deleteReport('${r.id}')">Delete</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function truncate(s, n) {
+      if (!s) return '';
+      return s.length > n ? s.slice(0,n) + '...' : s;
+    }
+    function escapeHtml(s){ if(!s) return ''; return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    function exportReport(id) {
+      const reports = loadReports();
+      const r = reports.find(x => x.id === id);
+      if (!r) { alert('Report not found'); return; }
+      const blob = new Blob([JSON.stringify(r, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `report-${r.id}.json`; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportAllReports() {
+      const all = loadReports();
+      if (all.length === 0) { alert('No reports to export'); return; }
+      const blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `cyberguard-reports.json`; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function deleteReport(id) {
+      if (!confirm('Delete this local report? This cannot be undone.')) return;
+      const arr = loadReports().filter(r => r.id !== id);
+      saveReports(arr);
+    }
+    function clearAllReports() {
+      if (!confirm('Clear all local reports?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderReports();
+    }
+
+    // ---------------------------
+    // Report form navigation (unchanged)
+    // ---------------------------
+    let currentStep = 1;
+    function updateStepper(){
+      document.getElementById('step-1-pill').style.opacity = currentStep===1?1:0.5;
+      document.getElementById('step-2-pill').style.opacity = currentStep===2?1:0.5;
+      document.getElementById('step-3-pill').style.opacity = currentStep===3?1:0.5;
+    }
+    function nextStep(){
+      if(currentStep===1){
+        document.getElementById('step-1').style.display='none';
+        document.getElementById('step-2').style.display='block';
+        currentStep=2; updateStepper();
+      } else if(currentStep===2){
+        document.getElementById('step-2').style.display='none';
+        document.getElementById('step-3').style.display='block';
+        currentStep=3; updateStepper();
+      }
+    }
+    function prevStep(){
+      if(currentStep===2){
+        document.getElementById('step-2').style.display='none';
+        document.getElementById('step-1').style.display='block';
+        currentStep=1; updateStepper();
+      } else if(currentStep===3){
+        document.getElementById('step-3').style.display='none';
+        document.getElementById('step-2').style.display='block';
+        currentStep=2; updateStepper();
+      }
+    }
+
+    function submitReport(){
+      const type = document.getElementById('incident-type').value;
+      const desc = document.getElementById('incident-desc').value.trim();
+      const contact = document.getElementById('report-contact').value.trim();
+      const evidenceInput = document.getElementById('evidence');
+      const detectorVal = document.getElementById('detector-input').value.trim();
+
+      if (!desc) { alert('Please provide incident details'); return; }
+
+      const evidenceName = evidenceInput?.files?.[0]?.name || null;
+
+      const report = {
+        id: 'CG' + Date.now().toString(36).slice(-8),
+        type,
+        desc,
+        contact: contact || null,
+        evidenceName,
+        detector: detectorVal || null,
+        createdAt: new Date().toISOString()
+      };
+
+      const arr = loadReports();
+      arr.unshift(report);
+      saveReports(arr);
+
+      alert('Report submitted locally. Tracking ID: ' + report.id + '\nSave this ID for follow-up.');
+      // reset UI
+      currentStep=1;
+      document.getElementById('step-3').style.display='none';
+      document.getElementById('step-2').style.display='none';
+      document.getElementById('step-1').style.display='block';
+      document.getElementById('incident-desc').value='';
+      document.getElementById('report-contact').value='';
+      document.getElementById('evidence').value='';
+      document.getElementById('incident-type').selectedIndex = 0;
+      updateStepper();
+    }
+
+    // ---------------------------
+    // Fake Link Detector (color-coded) (unchanged)
+    // ---------------------------
+    function analyzeLink() {
+      const val = document.getElementById('detector-input').value.trim();
+      const res = document.getElementById('detector-result');
+      const meter = document.getElementById('meter-bar');
+      if (!val) {
+        res.textContent = 'Paste a URL or message to analyze';
+        meter.style.width = '0%';
+        meter.style.background = '';
+        res.style.background = 'rgba(255,255,255,0.05)';
+        return;
+      }
+
+      let score = 20;
+      const lower = val.toLowerCase();
+      if (/https?:\/\/[0-9.]+/.test(val)) score += 30; // numeric IPs
+      if (lower.includes('login') || lower.includes('secure') || lower.includes('verify') || lower.includes('bank') || lower.includes('account')) score += 20;
+      if (lower.length > 80) score += 10;
+      if (lower.includes('bit.ly') || lower.includes('tinyurl') || lower.includes('goo.gl')) score += 10;
+      if (lower.includes('@@') || lower.includes('%')) score += 10;
+      if (lower.includes('facebook') || lower.includes('whatsapp') || lower.includes('google') || lower.includes('microsoft')) score -= 20;
+
+      // clamp
+      score = Math.max(0, Math.min(95, score));
+
+      let color = '#00ff9c', msg = '✅ Likely Safe', width = '20%';
+      if (score < 30) { color = '#00ff9c'; msg = '✅ Likely Safe'; width = '20%'; }
+      else if (score < 60) { color = '#ffcc00'; msg = '⚠️ Potentially Risky'; width = '55%'; }
+      else { color = '#ff0033'; msg = '🚨 Dangerous — Avoid'; width = '90%'; }
+
+      meter.style.width = width;
+      meter.style.background = `linear-gradient(90deg, ${color}, ${shadeColor(color, -20)})`;
+      res.textContent = msg;
+      res.style.background = hexToRgba(color, 0.14);
+      res.title = `Risk score: ${score}/95`;
+      res.dataset.score = score;
+    }
+
+    function copyDetector(){
+      const res = document.getElementById('detector-result').textContent;
+      navigator.clipboard?.writeText(res).then(()=>alert('Detector result copied'));
+    }
+
+    // ---------------------------
+    // Helper UI utilities (unchanged)
+    // ---------------------------
+    function shadeColor(hex, percent) {
+      if(!hex) return hex;
+      const c = hex.replace('#','');
+      const num = parseInt(c,16);
+      let r = (num >> 16) + percent;
+      let b = ((num >> 8) & 0x00FF) + percent;
+      let g = (num & 0x0000FF) + percent;
+      r = Math.max(Math.min(255, r), 0); b = Math.max(Math.min(255, b), 0); g = Math.max(Math.min(255, g), 0);
+      return '#' + (g | (b << 8) | (r << 16)).toString(16).padStart(6,'0');
+    }
+    function hexToRgba(hex, alpha){
+      if(!hex) return '';
+      const c = hex.replace('#','');
+      const num = parseInt(c,16);
+      const r = num >> 16;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // ---------------------------
+    // Mini games / tips / quick tools (unchanged)
+    // ---------------------------
+    const tips = [
+      "Never share OTPs or banking details online.",
+      "Always check for HTTPS before logging in.",
+      "Avoid clicking on unknown shortened links.",
+      "Use 2FA (Two-Factor Authentication) for extra safety.",
+      "Update your passwords every 3 months.",
+      "Be cautious of urgent messages asking for money."
+    ];
+    let tipIndex = 0;
+    setInterval(() => {
+      const el = document.getElementById("daily-tip");
+      if(el) el.textContent = tips[tipIndex];
+      tipIndex = (tipIndex + 1) % tips.length;
+    }, 7000);
+
+    function startScamGame() {
+      const choice = prompt("You got a message: 'Congrats! You won ₹10,000. Click http://win-fast.net to claim.'\nDo you click? (yes/no)");
+      if (!choice) return;
+      alert(choice.toLowerCase().includes("no")
+        ? "✅ Correct! That’s a phishing scam — don’t click links like that."
+        : "🚨 That was risky. Always verify the URL and sender before clicking.");
+    }
+
+    function openQuiz(){ alert('Quiz demo: This demo opens a gamified quiz in the full product.'); }
+    function openPasswordCheck(){
+      const pwd = prompt('Enter a sample password to check (demo):');
+      if(!pwd) return;
+      let score = 0;
+      if(pwd.length>=8) score+=30; if(/[A-Z]/.test(pwd)) score+=20; if(/[0-9]/.test(pwd)) score+=20; if(/[^A-Za-z0-9]/.test(pwd)) score+=30;
+      alert('Password strength: ' + (score>70? 'Strong': score>40?'Moderate':'Weak') + ' ('+score+'%)');
+    }
+    function openPrivacyAudit(){ alert('Privacy Audit demo: In production this analyzes public profile exposure and gives recommendations.'); }
+    function openPasswordCheck(){ openPasswordCheck; }
+
+    // ---------------------------
+    // Detector -> Report connector
+    // ---------------------------
+    function reportFromDetector(){
+      document.getElementById('report').scrollIntoView({behavior:'smooth'});
+      const v = document.getElementById('detector-input').value;
+      document.getElementById('incident-desc').value = 'Reported via link scanner: ' + v;
+      currentStep=2;document.getElementById('step-1').style.display='none';document.getElementById('step-2').style.display='block';updateStepper();
+    }
+
+    // FIR template generator
+    function generateFIR(){
+      const template = `FIR Template:\n\nDate: ${new Date().toLocaleDateString()}\nIncident Type: [fill]\nDescription: [paste description here]\nEvidence: [attach screenshots]\nContact: [email / phone]\n\nPlease submit this as an attachment to your local cyber cell or police station.`;
+      navigator.clipboard?.writeText(template).then(()=>alert('FIR template copied to clipboard — paste into a doc and submit to authorities.'));
+    }
+
+    // ---------------------------
+    // Utilities on load
+    // ---------------------------
+    function init(){
+      updateStepper();
+      renderReports();
+      setInterval(()=> {
+        const mm = document.getElementById('threat-meter');
+        if(!mm) return;
+        const w = 45 + Math.floor(Math.random()*35);
+        mm.style.width = w + '%';
+      }, 5000);
+    }
+
+    // small keyboard shortcut: press '/' to focus detector
+    document.addEventListener('keydown', function(e){ if(e.key==='/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){ e.preventDefault(); document.getElementById('detector-input').focus(); }});
+
+    // call init
+    init();
+  </script>
+</body>
+</html>
